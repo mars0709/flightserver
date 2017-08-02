@@ -31,8 +31,8 @@ Starting build... but first, coffee!
        engines.node (package.json):  4.5.x
        engines.npm (package.json):   unspecified (use default)
 
-       Resolving node version 4.5.x via semver.io...
-       Downloading and installing node 4.5.0...
+       Downloading and installing node 4.5.0
+       Resolving node version 4.5.x via semver.io......
        Using default npm version: 2.15.9
 
 -----> Restoring cache

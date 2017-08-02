@@ -1,11 +1,15 @@
 var express = require('express');
 var exec = require('child_process').exec;
-var app = express();
+var cors = require('cors');
+var bodyParser = require('body-parser');
+var http = require('http');
+var https = require('https');
 
-// Return a 200 for kubernetes healthchecks
-app.get('/healthz', function(req, res){
-  res.status(200).end();
-});
+var app = express();
+app.use(cors());
+app.use(bodyParser.json());
+
+var server = http.createServer(app);
 
 app.get('/', function(req, res){
   var poweredBy = process.env.POWERED_BY;
@@ -26,8 +30,33 @@ app.get('/', function(req, res){
   });
 });
 
+app.post('/api', function(req, res){
+     //console.log(req.body);
+     var endpoint = req.body.endpoint + '?' + 'appId=' + req.body.appId + '&appKey=' + req.body.appKey;
+     var options = {
+         host: 'api.flightstats.com',
+         path: endpoint
+     };
+
+     var getFlightData = https.get(options, function(response){
+         var output ='';
+         response.on('data', function(data){
+             output += data;
+         });
+
+         response.on('end', function(){
+             //console.log(output);
+             res.write(output);
+             res.send();
+         });
+     });
+
+     getFlightData.end();
+});
+
 /* Use PORT environment variable if it exists */
 var port = process.env.PORT || 5000;
-server = app.listen(port, function () {
-  console.log('Server listening on port %d in %s mode', server.address().port, app.settings.env);
+
+server.listen(port, function () {
+    console.log('Server listening on port %d in %s mode', server.address().port, app.settings.env);
 });
